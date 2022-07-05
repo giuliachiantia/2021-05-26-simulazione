@@ -5,8 +5,11 @@
 package it.polito.tdp.yelp;
 
 import java.net.URL;
+import java.time.Year;
+import java.util.List;
 import java.util.ResourceBundle;
 
+import it.polito.tdp.yelp.model.Business;
 import it.polito.tdp.yelp.model.Model;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
@@ -35,16 +38,16 @@ public class FXMLController {
     private Button btnPercorso; // Value injected by FXMLLoader
 
     @FXML // fx:id="cmbCitta"
-    private ComboBox<?> cmbCitta; // Value injected by FXMLLoader
+    private ComboBox<String> cmbCitta; // Value injected by FXMLLoader
 
     @FXML // fx:id="txtX"
     private TextField txtX; // Value injected by FXMLLoader
 
     @FXML // fx:id="cmbAnno"
-    private ComboBox<?> cmbAnno; // Value injected by FXMLLoader
+    private ComboBox<Year> cmbAnno; // Value injected by FXMLLoader
 
     @FXML // fx:id="cmbLocale"
-    private ComboBox<?> cmbLocale; // Value injected by FXMLLoader
+    private ComboBox<Business> cmbLocale; // Value injected by FXMLLoader
 
     @FXML // fx:id="txtResult"
     private TextArea txtResult; // Value injected by FXMLLoader
@@ -52,15 +55,31 @@ public class FXMLController {
     @FXML
     void doCalcolaPercorso(ActionEvent event) {
     	
+    		
     }
 
     @FXML
     void doCreaGrafo(ActionEvent event) {
-
+    	String city = cmbCitta.getValue() ;
+    	Year anno = cmbAnno.getValue() ;
+    	
+    	if(city==null || anno==null) {
+    		txtResult.appendText("Parametri obbligatori");
+    		return ;
+    	}
+    	
+    	String msg = model.creaGrafo(city, anno) ;
+    	txtResult.appendText(msg);
+    	cmbLocale.getItems().clear();
+    	cmbLocale.getItems().addAll(model.getVertici()) ;
     }
 
     @FXML
     void doLocaleMigliore(ActionEvent event) {
+    	
+    	Business best = model.getLocaleMigliore() ;
+    	
+    	txtResult.appendText("Locale migliore: "+best.getBusinessName()+"\n");
 
     }
 
@@ -78,5 +97,11 @@ public class FXMLController {
     
     public void setModel(Model model) {
     	this.model = model;
+    	
+    	cmbCitta.getItems().addAll(model.getAllCities()) ;
+    	
+    	for(int anno=2005; anno<=2013; anno++) {
+    		cmbAnno.getItems().add(Year.of(anno)) ;
+    	}
     }
 }
